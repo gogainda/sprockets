@@ -16,7 +16,7 @@ jobs:
           - { ruby: "3.0" }
           - { ruby: jruby, experimental: true }
           - { ruby: jruby-head, experimental: true }
-          - { ruby: truffleruby-head, experimental: true }
+          - { ruby: truffleruby-head, experimental: true  }
 
     steps:
       - uses: actions/checkout@v2
