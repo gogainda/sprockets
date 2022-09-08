@@ -123,6 +123,50 @@ module FreshnessTests
       end
     end
   end
+
+  test "modify asset's dependency file in directory" do
+    main = fixture_path('asset/test-main.js.erb')
+    dep  = fixture_path('asset/data/foo.txt')
+    begin
+      ::FileUtils.mkdir File.dirname(dep)
+      sandbox main, dep do
+        write(main, "//= depend_on_directory ./data\n<%= File.read('#{dep}') %>")
+        write(dep, "a;")
+        asset      = asset('test-main.js')
+        old_digest = asset.hexdigest
+        old_uri    = asset.uri
+        assert_equal "a;\n", asset.to_s
+
+        write(dep, "b;")
+        asset = asset('test-main.js')
+        refute_equal old_digest, asset.hexdigest
+        refute_equal old_uri, asset.uri
+        assert_equal "b;\n", asset.to_s
+      end
+    ensure
+      ::FileUtils.rmtree File.dirname(dep)
+    end
+  end
+
+  test "asset's dependency on directory exists" do
+    main = fixture_path('asset/test-missing-directory.js.erb')
+    dep  = fixture_path('asset/data/foo.txt')
+
+    begin
+      sandbox main, dep do
+        ::FileUtils.rmtree File.dirname(dep)
+        write(main, "//= depend_on_directory ./data")
+        assert_raises(Sprockets::ArgumentError) do
+          asset('test-missing-directory.js')
+        end
+
+        ::FileUtils.mkdir File.dirname(dep)
+        assert asset('test-missing-directory.js')
+      end
+    ensure
+      ::FileUtils.rmtree File.dirname(dep)
+    end
+  end
 end
 
 class TextStaticAssetTest < Sprockets::TestCase
@@ -1141,6 +1185,18 @@ class PreDigestedAssetTest < Sprockets::TestCase
 
     assert_equal "application-d41d8cd98f00b204e9800998ecf8427e.digested.js",
       asset("application-d41d8cd98f00b204e9800998ecf8427e.digested.js").digest_path
+  ensure
+    FileUtils.rm(digested) if File.exist?(digested)
+  end
+
+  test "digest base32 path" do
+    path     = File.expand_path("test/fixtures/asset/application")
+    original = "#{path}.js"
+    digested = "#{path}-TQDC3LZV.digested.js"
+    FileUtils.cp(original, digested)
+
+    assert_equal "application-TQDC3LZV.digested.js",
+      asset("application-TQDC3LZV.digested.js").digest_path
   ensure
     FileUtils.rm(digested) if File.exist?(digested)
   end

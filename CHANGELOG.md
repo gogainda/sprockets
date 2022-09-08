@@ -2,7 +2,19 @@
 
 Get upgrade notes from Sprockets 3.x to 4.x at https://github.com/rails/sprockets/blob/master/UPGRADING.md
 
-## Master
+- Fix `Sprockets::Server` to return response headers to compatible with with Rack::Lint 2.0.
+
+## 4.1.0
+
+- Allow age to be altered in asset:clean rake task.
+- Fix `Sprockets::Server` to return lower-cased response headers to comply with Rack::Lint 3.0. [#744](https://github.com/rails/sprockets/pull/744)
+- Adding new directive `depend_on_directory` [#668](https://github.com/rails/sprockets/pull/668)
+- Fix `application/js-sourcemap+json` charset [#669](https://github.com/rails/sprockets/pull/669)
+- Fix `CachedEnvironment` caching nil values [#723](https://github.com/rails/sprockets/pull/723)
+- Process `*.jst.ejs.erb` files with ERBProcessor [#674](https://github.com/rails/sprockets/pull/674)
+- Fix cache key for coffee script processor to be dependent on the filename [#670](https://github.com/rails/sprockets/pull/670)
+
+## 4.0.3
 
 - Fix `Manifest#find` yielding from a Promise causing issue on Ruby 3.1.0-dev. [#720](https://github.com/rails/sprockets/pull/720)
 - Better detect the ERB version to avoid deprecation warnings. [#719](https://github.com/rails/sprockets/pull/719)
